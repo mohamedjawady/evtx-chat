@@ -882,9 +882,9 @@ def ask_ollama(question, context, techniques_used=None):
     if techniques_used:
         techniques_info = f"\n\nRetrieval Techniques Used: {', '.join(techniques_used)}"
 
-    prompt = ChatPromptTemplate.from_template(template.format(context=context, question=question, techniques_info=techniques_info))
+    formatted_prompt = template.format(context=context, question=question, techniques_info=techniques_info)
     model = OllamaLLM(model="deepseek-r1:7b", temperature=0)  # Use deepseek for better reasoning
-    answer = model.invoke(prompt)
+    answer = model.invoke(formatted_prompt)
     return answer
 
 
