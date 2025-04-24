@@ -1,103 +1,174 @@
-/* Overall styling */
+
+/* Modern UI Variables */
 :root {
     --primary-text: #f8f9fa;
     --secondary-text: #adb5bd;
-    --dark-bg: #212529;
+    --dark-bg: #1a1d20;
     --card-bg: #2c3034;
     --highlight: #0d6efd;
+    --border-radius: 0.75rem;
+    --transition: all 0.3s ease;
 }
 
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: var(--dark-bg);
 }
 
 .footer {
     margin-top: auto;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Chat styling */
+/* Enhanced Card Styling */
+.card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+/* Modern Chat Interface */
 .chat-container {
-    height: 400px;
+    height: 450px;
     overflow-y: auto;
-    border: 1px solid #444;
-    border-radius: 0.25rem;
-    padding: 1rem;
-    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    scroll-behavior: smooth;
 }
 
 .message {
     margin-bottom: 1rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--border-radius);
     max-width: 85%;
+    transition: var(--transition);
 }
 
 .user-message {
-    background-color: var(--highlight);
+    background: linear-gradient(135deg, var(--highlight), #0a58ca);
     color: white;
     margin-left: auto;
-    border-radius: 1rem 1rem 0 1rem;
+    border-radius: var(--border-radius) var(--border-radius) 0 var(--border-radius);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
 }
 
 .bot-message {
     background-color: var(--card-bg);
     color: var(--primary-text);
     margin-right: auto;
-    border-radius: 1rem 1rem 1rem 0;
+    border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .system-message {
     color: var(--secondary-text);
     text-align: center;
-    padding: 0.5rem;
+    padding: 0.75rem;
     margin-bottom: 1rem;
     font-style: italic;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
 }
 
-/* Loading spinner */
+/* Enhanced Input Styling */
+.input-group {
+    margin-top: 1.5rem;
+}
+
+.form-control {
+    border-radius: var(--border-radius) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.btn {
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--highlight), #0a58ca);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+/* Modern Loading Spinner */
 .spinner {
     display: inline-block;
-    width: 1rem;
-    height: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
     border: 0.2rem solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: #fff;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
-/* Context cards */
+/* Enhanced Context Cards */
 .context-card {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     border-left: 4px solid var(--highlight);
+    transition: var(--transition);
 }
 
-.relevance-badge {
-    font-size: 0.75rem;
+.context-card:hover {
+    transform: translateX(4px);
 }
 
-/* Document list */
+/* Document List Styling */
 .document-list {
     max-height: 300px;
     overflow-y: auto;
+    border-radius: var(--border-radius);
 }
 
-/* Utils */
-.text-pre-wrap {
-    white-space: pre-wrap;
+.list-group-item {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
 }
 
-/* Make code blocks look nicer */
+.list-group-item:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Code Block Styling */
 pre, code {
-    background-color: #343a40;
-    border-radius: 0.25rem;
+    background-color: #1d2025;
+    border-radius: var(--border-radius);
     padding: 0.2rem 0.4rem;
-    font-family: monospace;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 pre {
@@ -105,9 +176,43 @@ pre {
     overflow-x: auto;
 }
 
-/* Responsive tweaks */
+/* Progress Bar Enhancement */
+.progress {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, var(--highlight), #0a58ca);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     .chat-container {
-        height: 300px;
+        height: 350px;
     }
+    
+    .message {
+        max-width: 95%;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
