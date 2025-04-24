@@ -944,7 +944,16 @@ def process_documents_sync(documents_to_process, is_background=False):
         processing_status['progress'] = 100
         processing_status['complete'] = True
         processing_status['in_progress'] = False
+        
+        if not is_background:
+            flash('Documents processed successfully', 'success')
+            return redirect(url_for('index'))
+            
     except Exception as e:
         processing_status['error'] = f"Error processing documents: {str(e)}"
         processing_status['complete'] = True
         processing_status['in_progress'] = False
+        
+        if not is_background:
+            flash(f'Error processing documents: {str(e)}', 'danger') 
+            return redirect(url_for('index'))
