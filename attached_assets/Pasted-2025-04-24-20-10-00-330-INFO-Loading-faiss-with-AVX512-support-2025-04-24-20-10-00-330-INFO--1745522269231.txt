@@ -1,0 +1,48 @@
+2025-04-24 20:10:00,330 - INFO - Loading faiss with AVX512 support.
+2025-04-24 20:10:00,330 - INFO - Could not load library with AVX512 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx512'")
+2025-04-24 20:10:00,330 - INFO - Loading faiss with AVX2 support.
+2025-04-24 20:10:00,354 - INFO - Successfully loaded faiss with AVX2 support.
+2025-04-24 20:10:00,360 - INFO - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes.
+2025-04-24 20:10:07,327 - INFO - Use pytorch device_name: cuda:0
+2025-04-24 20:10:07,327 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-04-24 20:10:07,332 - DEBUG - Starting new HTTPS connection (1): huggingface.co:443
+2025-04-24 20:10:07,842 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json HTTP/1.1" 200 0
+2025-04-24 20:10:08,003 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json HTTP/1.1" 200 0
+2025-04-24 20:10:08,192 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md HTTP/1.1" 200 0
+2025-04-24 20:10:08,348 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json HTTP/1.1" 200 0
+2025-04-24 20:10:08,706 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json HTTP/1.1" 200 0
+2025-04-24 20:10:08,947 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json HTTP/1.1" 404 0
+2025-04-24 20:10:09,102 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json HTTP/1.1" 200 0
+2025-04-24 20:10:09,952 - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json HTTP/1.1" 200 0
+2025-04-24 20:10:10,148 - DEBUG - https://huggingface.co:443 "GET /api/models/sentence-transformers/all-MiniLM-L6-v2/revision/main HTTP/1.1" 200 6766
+2025-04-24 20:10:10,987 - DEBUG - https://huggingface.co:443 "GET /api/models/sentence-transformers/all-MiniLM-L6-v2 HTTP/1.1" 200 6766
+Batches: 100%|█████████████████████████████████████████████████████████████████████| 3829/3829 [03:15<00:00, 19.62it/s]
+2025-04-24 20:13:30,184 - INFO - Saved 0 files to cache
+2025-04-24 20:13:30,184 - ERROR - Error processing documents: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2025-04-24 20:13:30,185 - ERROR - Error during pre-processing: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2025-04-24 20:13:30,207 - WARNING -  * Debugger is active!
+2025-04-24 20:13:30,217 - INFO -  * Debugger PIN: 821-649-311
+2025-04-24 20:14:33,039 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:33] "GET / HTTP/1.1" 200 -
+2025-04-24 20:14:33,573 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:33] "GET /static/css/custom.css HTTP/1.1" 304 -
+2025-04-24 20:14:33,822 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:33] "GET /static/js/chat_uploads.js HTTP/1.1" 304 -
+2025-04-24 20:14:33,849 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:33] "GET /static/js/main.js HTTP/1.1" 304 -
+2025-04-24 20:14:39,859 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:39] "POST /process HTTP/1.1" 200 -
+2025-04-24 20:14:40,876 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:40] "GET /processing-status HTTP/1.1" 200 -
+2025-04-24 20:14:42,220 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:42] "GET / HTTP/1.1" 200 -
+2025-04-24 20:14:42,269 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:42] "GET /static/css/custom.css HTTP/1.1" 304 -
+2025-04-24 20:14:42,476 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:42] "GET /static/js/chat_uploads.js HTTP/1.1" 304 -
+2025-04-24 20:14:42,580 - INFO - 127.0.0.1 - - [24/Apr/2025 20:14:42] "GET /static/js/main.js HTTP/1.1" 304 -
+2025-04-24 20:15:25,062 - ERROR - Error generating multiple queries: timed out
+Batches: 100%|███████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  5.91it/s]
+2025-04-24 20:15:57,323 - ERROR - Error answering question: timed out
+2025-04-24 20:15:57,324 - INFO - 127.0.0.1 - - [24/Apr/2025 20:15:57] "POST /ask HTTP/1.1" 200 -
+2025-04-24 20:16:51,174 - INFO - 127.0.0.1 - - [24/Apr/2025 20:16:51] "GET /static/css/custom.css HTTP/1.1" 304 -
