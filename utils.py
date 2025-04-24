@@ -447,9 +447,14 @@ def build_vectorstore(chunks):
     # Normalize the vectors
     faiss.normalize_L2(embeddings)
 
-    # Build the FAISS index
-    index = faiss.IndexFlatIP(embeddings.shape[1])
-    index.add(embeddings)
+    try:
+        # Build the FAISS index
+        index = faiss.IndexFlatIP(embeddings.shape[1])
+        index.add(embeddings)
+    except Exception as e:
+        logging.error(f"Error building FAISS index: {str(e)}")
+        # Fall back to simple vector store
+        return SimpleVectorStore(chunks)
 
     # Save index and metadata
     if not os.path.exists('faiss_store'):

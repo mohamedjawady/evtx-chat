@@ -567,9 +567,9 @@ def preprocess_existing_documents():
             if documents_to_process:
                 process_documents_sync(documents_to_process)
             
-        logging.info(f"Pre-processing complete. {len(PROCESSED_FILES)} files in cache.")
-    except Exception as e:
-        logging.error(f"Error during pre-processing: {str(e)}")
+            logging.info(f"Pre-processing complete. {len(PROCESSED_FILES)} files in cache.")
+        except Exception as e:
+            logging.error(f"Error during pre-processing: {str(e)}")
 
 if __name__ == "__main__":
     # Configure logging
