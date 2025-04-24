@@ -24,6 +24,8 @@ class OllamaLLM:
 
     def invoke(self, prompt):
         """Send prompt to Ollama API and return response using urllib instead of requests"""
+        import socket
+        socket.setdefaulttimeout(120)  # Increase socket timeout
 
         # For compatibility with various prompt formats
         if hasattr(prompt, 'format'):
@@ -41,7 +43,9 @@ class OllamaLLM:
             "model": self.model,
             "prompt": formatted_prompt,
             "temperature": self.temperature,
-            "stream": False
+            "stream": False,
+            "num_ctx": 4096,  # Increase context window
+            "num_thread": 4   # Limit threads
         }
 
         # Convert data to JSON string and encode as bytes
@@ -54,9 +58,9 @@ class OllamaLLM:
             headers={'Content-Type': 'application/json'}
         )
 
-        # Send the request
+        # Send the request with increased timeout
         try:
-            with urllib.request.urlopen(req, timeout=30) as response:
+            with urllib.request.urlopen(req, timeout=120) as response:
                 # Read and decode the response
                 response_data = response.read().decode('utf-8')
                 response_json = json.loads(response_data)
@@ -414,18 +418,31 @@ def build_vectorstore(chunks):
     from sentence_transformers import SentenceTransformer
     import os
     import pickle
+    import torch
 
-    # Initialize the encoder
-    encoder = SentenceTransformer('all-MiniLM-L6-v2')
-    # encoder = SentenceTransformer('all-MiniLM-L6-v2').to('cuda')
+    # Initialize the encoder with CPU device
+    device = "cpu"  # Default to CPU
+    try:
+        if torch.cuda.is_available():
+            device = "cuda:0"
+    except:
+        pass
 
-    # Convert documents to embeddings
+    encoder = SentenceTransformer('all-MiniLM-L6-v2', device=device)
+    
+    # Convert documents to embeddings with larger batch size and proper error handling
     documents = [chunk.page_content for chunk in chunks]
     metadatas = [chunk.metadata for chunk in chunks]
-    # embeddings = encoder.encode(documents, batch_size=14, show_progress_bar=True)
-    embeddings = encoder.encode(documents, batch_size=14, show_progress_bar=True, convert_to_numpy=True, convert_to_tensor=False, num_workers=4)
-
-    # embeddings = encoder.encode(documents, device='cuda')
+    
+    try:
+        embeddings = encoder.encode(
+            documents,
+            batch_size=32,  # Increased batch size
+            show_progress_bar=True,
+            convert_to_numpy=True,
+            convert_to_tensor=False,
+            num_workers=1  # Reduced workers to prevent issues
+        )
 
     # Normalize the vectors
     faiss.normalize_L2(embeddings)

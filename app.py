@@ -546,25 +546,26 @@ register_upload_routes(app, process_documents)
 def preprocess_existing_documents():
     """Pre-process all existing documents in the docs folder"""
     logging.info("Pre-processing existing documents...")
-    try:
-        # Load processed files cache
-        global PROCESSED_FILES
-        PROCESSED_FILES = load_processed_files()
-        
-        # Scan for existing documents
-        scan_for_documents()
-        
-        # Get unprocessed documents
-        valid_docs = verify_registry_documents()
-        documents_to_process = []
-        
-        for doc in valid_docs:
-            file_path = doc.get('file_path')
-            if file_path not in PROCESSED_FILES and (file_path.endswith('.pdf') or file_path.endswith('.txt')):
-                documents_to_process.append(file_path)
-        
-        if documents_to_process:
-            process_documents_sync(documents_to_process)
+    with app.app_context():
+        try:
+            # Load processed files cache
+            global PROCESSED_FILES
+            PROCESSED_FILES = load_processed_files()
+            
+            # Scan for existing documents
+            scan_for_documents()
+            
+            # Get unprocessed documents
+            valid_docs = verify_registry_documents()
+            documents_to_process = []
+            
+            for doc in valid_docs:
+                file_path = doc.get('file_path')
+                if file_path not in PROCESSED_FILES and (file_path.endswith('.pdf') or file_path.endswith('.txt')):
+                    documents_to_process.append(file_path)
+            
+            if documents_to_process:
+                process_documents_sync(documents_to_process)
             
         logging.info(f"Pre-processing complete. {len(PROCESSED_FILES)} files in cache.")
     except Exception as e:
