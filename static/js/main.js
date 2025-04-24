@@ -200,6 +200,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to format bot response (handling code blocks, lists, etc.)
     function formatBotResponse(text) {
+        // Remove any JSON code block markers
+        text = text.replace(/```json/g, '');
+        text = text.replace(/```/g, '');
+        
+        // Convert URLs to links
+        text = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+        
+        // Handle line breaks
+        text = text.replace(/\n/g, '<br>');
+        
+        return text;
+    }
         // Basic markdown-like formatting
         let formattedText = escapeHtml(text);
         
