@@ -6,7 +6,8 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from utils import (extract_text_from_pdf, chunk_texts, build_vectorstore,
-                   retrieve_contexts, enhanced_retrieve_contexts, ask_ollama)
+                   retrieve_contexts, enhanced_retrieve_contexts, ask_ollama,
+                   load_processed_files, save_processed_files, PROCESSED_FILES)
 
 # Import chat upload routes
 from upload_during_chat import register_upload_routes
