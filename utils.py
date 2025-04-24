@@ -850,6 +850,4 @@ def ask_ollama(question, context, techniques_used=None):
     - Indicators of Compromise (IOCs)
     - Tactics, Techniques, and Procedures (TTPs)
     - Affected systems or software
-    - Mitigation strategies
-
-    IMPORTANTjson", "").replace("
+    - Mitigation strategies"""
