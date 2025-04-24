@@ -135,16 +135,26 @@ CACHE_FILE = os.path.join(os.getcwd(), "docs", "processed_files.json")
 
 def load_processed_files():
     """Load the set of processed files from cache"""
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, 'r') as f:
-            return set(json.load(f))
+    try:
+        cache_file = os.path.join(os.path.dirname(__file__), 'processed_files.json')
+        if os.path.exists(cache_file):
+            with open(cache_file, 'r') as f:
+                files = set(json.load(f))
+                logging.info(f"Loaded {len(files)} files from cache")
+                return files
+    except Exception as e:
+        logging.error(f"Error loading processed files cache: {e}")
     return set()
 
 def save_processed_files():
     """Save the set of processed files to cache"""
-    os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
-    with open(CACHE_FILE, 'w') as f:
-        json.dump(list(PROCESSED_FILES), f)
+    try:
+        cache_file = os.path.join(os.path.dirname(__file__), 'processed_files.json')
+        with open(cache_file, 'w') as f:
+            json.dump(list(PROCESSED_FILES), f)
+        logging.info(f"Saved {len(PROCESSED_FILES)} files to cache")
+    except Exception as e:
+        logging.error(f"Error saving processed files: {e}")
 
 @dataclass
 class Document:
@@ -831,7 +841,7 @@ def enhanced_retrieve_contexts(question, retriever, model=None, use_multi_query=
         for i, doc in enumerate(standard_docs):
             context_obj = {
                 'content': doc.page_content,
-                'score': round((1 - (i * 0.1)) * 100),
+'score': round((1 - (i * 0.1)) * 100),
                 'method': "standard",
                 'source': doc.metadata.get("source_idx", "unknown"),
                 'document': os.path.basename(doc.metadata.get("file_path", "unknown"))
@@ -944,16 +954,16 @@ def process_documents_sync(documents_to_process, is_background=False):
         processing_status['progress'] = 100
         processing_status['complete'] = True
         processing_status['in_progress'] = False
-        
+
         if not is_background:
             flash('Documents processed successfully', 'success')
             return redirect(url_for('index'))
-            
+
     except Exception as e:
         processing_status['error'] = f"Error processing documents: {str(e)}"
         processing_status['complete'] = True
         processing_status['in_progress'] = False
-        
+
         if not is_background:
             flash(f'Error processing documents: {str(e)}', 'danger') 
             return redirect(url_for('index'))
