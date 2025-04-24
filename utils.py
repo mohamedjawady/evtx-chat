@@ -443,9 +443,12 @@ def build_vectorstore(chunks):
             convert_to_tensor=False,
             num_workers=1  # Reduced workers to prevent issues
         )
-
-    # Normalize the vectors
-    faiss.normalize_L2(embeddings)
+        
+        # Normalize the vectors
+        faiss.normalize_L2(embeddings)
+    except Exception as e:
+        logging.error(f"Error encoding documents: {str(e)}")
+        return SimpleVectorStore(chunks)
 
     try:
         # Build the FAISS index
