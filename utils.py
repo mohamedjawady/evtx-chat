@@ -868,3 +868,83 @@ def ask_ollama(question, context, techniques_used=None):
     - Tactics, Techniques, and Procedures (TTPs)
     - Affected systems or software
     - Mitigation strategies"""
+
+    techniques_info = ""
+    if techniques_used:
+        techniques_info = f"\n\nRetrieval Techniques Used: {', '.join(techniques_used)}"
+
+    prompt = ChatPromptTemplate.from_template(template.format(context=context, question=question, techniques_info=techniques_info))
+    model = OllamaLLM(model="deepseek-r1:7b", temperature=0)  # Use deepseek for better reasoning
+    answer = model.invoke(prompt)
+    return answer
+
+
+# Placeholder for processing status
+processing_status = {
+    'in_progress': False,
+    'complete': False,
+    'progress': 0,
+    'message': '',
+    'error': ''
+}
+
+# Placeholder for vector store (will be initialized later)
+vectorstore = None
+has_documents = False
+
+
+def process_documents_sync(documents_to_process, is_background=False):
+    """Process documents synchronously"""
+    global vectorstore, has_documents, processing_status, PROCESSED_FILES
+    if not documents_to_process:
+        processing_status['error'] = 'No documents to process'
+        return
+
+    # Load existing cache
+    try:
+        PROCESSED_FILES = load_processed_files()
+    except Exception as e:
+        logging.warning(f"Could not load processed files cache: {e}")
+        PROCESSED_FILES = set()
+
+    # Filter out already processed files
+    documents_to_process = [doc for doc in documents_to_process if doc not in PROCESSED_FILES]
+
+    if not documents_to_process:
+        processing_status['message'] = 'All documents already processed'
+        processing_status['progress'] = 100
+        processing_status['complete'] = True
+        processing_status['in_progress'] = False
+        return
+
+    # Create a set to track newly processed files
+    newly_processed = set()
+
+    try:
+        # Start processing
+        processing_status['in_progress'] = True
+        processing_status['message'] = 'Processing documents...'
+        processing_status['progress'] = 0
+
+        # Process each document
+        texts = load_pdfs(documents_to_process[0]) # Assuming documents_to_process is a directory path
+        chunks = chunk_texts(texts)
+        vectorstore = build_vectorstore(chunks)
+        has_documents = True
+
+        # Update cache with newly processed files
+        PROCESSED_FILES.update(newly_processed)
+        try:
+            save_processed_files()
+            logging.info(f"Updated cache with {len(newly_processed)} new files")
+        except Exception as e:
+            logging.error(f"Failed to save processed files cache: {e}")
+
+        # Mark as complete
+        processing_status['progress'] = 100
+        processing_status['complete'] = True
+        processing_status['in_progress'] = False
+    except Exception as e:
+        processing_status['error'] = f"Error processing documents: {str(e)}"
+        processing_status['complete'] = True
+        processing_status['in_progress'] = False
