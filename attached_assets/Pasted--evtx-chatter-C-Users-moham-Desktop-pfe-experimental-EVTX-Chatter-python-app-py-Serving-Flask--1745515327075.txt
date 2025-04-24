@@ -1,0 +1,31 @@
+(evtx-chatter) C:\Users\moham\Desktop\pfe\experimental\EVTX-Chatter>python app.py
+ * Serving Flask app 'app'
+ * Debug mode: on
+2025-04-24 18:20:26,547 - INFO - WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8888
+ * Running on http://192.168.160.42:8888
+2025-04-24 18:20:26,548 - INFO - Press CTRL+C to quit
+2025-04-24 18:20:26,549 - INFO -  * Restarting with stat
+2025-04-24 18:20:26,834 - WARNING -  * Debugger is active!
+2025-04-24 18:20:26,842 - INFO -  * Debugger PIN: 821-649-311
+2025-04-24 18:20:35,689 - INFO - 127.0.0.1 - - [24/Apr/2025 18:20:35] "GET / HTTP/1.1" 200 -
+2025-04-24 18:20:35,974 - INFO - 127.0.0.1 - - [24/Apr/2025 18:20:35] "GET /static/css/custom.css HTTP/1.1" 304 -
+2025-04-24 18:20:36,041 - INFO - 127.0.0.1 - - [24/Apr/2025 18:20:36] "GET /static/js/chat_uploads.js HTTP/1.1" 304 -
+2025-04-24 18:20:36,306 - INFO - 127.0.0.1 - - [24/Apr/2025 18:20:36] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-04-24 18:20:37,595 - INFO - 127.0.0.1 - - [24/Apr/2025 18:20:37] "GET /favicon.ico HTTP/1.1" 404 -
+2025-04-24 18:20:42,396 - INFO - Processed PDF: Andrew Pease - Threat Hunting with Elastic Stack (2021, Packt Publishing Pvt Ltd) - libgen.li.pdf: 23745482 characters
+2025-04-24 18:20:42,933 - INFO - Processed PDF: Ben Clark - Rtfm_ Red Team Field Manual (2014, CreateSpace Independent Publishing Platform) - libgen.li.pdf: 4186778 characters
+2025-04-24 18:20:43,974 - INFO - 🔹 Created 53603 chunks from 2 documents.
+2025-04-24 18:20:44,185 - DEBUG - Environment variable FAISS_OPT_LEVEL is not set, so let's pick the instruction set according to the current CPU
+2025-04-24 18:20:44,212 - INFO - Loading faiss with AVX512 support.
+2025-04-24 18:20:44,212 - INFO - Could not load library with AVX512 support due to:
+ModuleNotFoundError("No module named 'faiss.swigfaiss_avx512'")
+2025-04-24 18:20:44,212 - INFO - Loading faiss with AVX2 support.
+2025-04-24 18:20:44,263 - INFO - Successfully loaded faiss with AVX2 support.
+2025-04-24 18:20:44,270 - INFO - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes.
+OMP: Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
+OMP: Hint This means that multiple copies of the OpenMP runtime have been linked into the program. That is dangerous, since it can degrade performance or cause incorrect results. The best thing to do is to ensure that only a single OpenMP runtime is linked into the process, e.g. by avoiding static linking of the OpenMP runtime in any library. As an unsafe, unsupported, undocumented workaround you can set the environment variable KMP_DUPLICATE_LIB_OK=TRUE to allow the program to continue to execute, but that may cause crashes or silently produce incorrect results. For more information, please see http://www.intel.com/software/products/support/.
+2025-04-24 18:20:46,623 - INFO -  * Restarting with stat
+2025-04-24 18:20:46,931 - WARNING -  * Debugger is active!
+2025-04-24 18:20:46,938 - INFO -  * Debugger PIN: 821-649-311
