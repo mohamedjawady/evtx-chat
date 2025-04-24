@@ -339,9 +339,17 @@ def process_documents_background(documents_to_process):
 
 def process_documents_sync(documents_to_process, is_background=False):
     """Process documents synchronously"""
-    global vectorstore, has_documents, processing_status
+    global vectorstore, has_documents, processing_status, PROCESSED_FILES
     if not documents_to_process:
         processing_status['error'] = 'No documents to process'
+        return
+        
+    # Filter out already processed files
+    documents_to_process = [doc for doc in documents_to_process if doc not in PROCESSED_FILES]
+    if not documents_to_process:
+        processing_status['message'] = 'All documents already processed'
+        processing_status['progress'] = 100
+        processing_status['complete'] = True
         return
 
     # Initialize flag to track if processing was already started
@@ -409,6 +417,11 @@ def process_documents_sync(documents_to_process, is_background=False):
         vectorstore = build_vectorstore(chunks)
         has_documents = True
 
+        # Add processed files to cache
+        for doc in documents_to_process:
+            PROCESSED_FILES.add(doc)
+        save_processed_files()
+            
         # Mark as complete
         processing_status['progress'] = 100
         processing_status[
@@ -529,6 +542,33 @@ def delete_document(filename):
 register_upload_routes(app, process_documents)
 
 
+def preprocess_existing_documents():
+    """Pre-process all existing documents in the docs folder"""
+    logging.info("Pre-processing existing documents...")
+    try:
+        # Load processed files cache
+        global PROCESSED_FILES
+        PROCESSED_FILES = load_processed_files()
+        
+        # Scan for existing documents
+        scan_for_documents()
+        
+        # Get unprocessed documents
+        valid_docs = verify_registry_documents()
+        documents_to_process = []
+        
+        for doc in valid_docs:
+            file_path = doc.get('file_path')
+            if file_path not in PROCESSED_FILES and (file_path.endswith('.pdf') or file_path.endswith('.txt')):
+                documents_to_process.append(file_path)
+        
+        if documents_to_process:
+            process_documents_sync(documents_to_process)
+            
+        logging.info(f"Pre-processing complete. {len(PROCESSED_FILES)} files in cache.")
+    except Exception as e:
+        logging.error(f"Error during pre-processing: {str(e)}")
+
 if __name__ == "__main__":
     # Configure logging
     logging.basicConfig(
@@ -536,8 +576,11 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[logging.FileHandler('error.log'),
                   logging.StreamHandler()])
-    # Exclude Python standard library from watchdog
-    import sys
+                  
+    # Pre-process existing documents
+    preprocess_existing_documents()
+                  
+    # Start the Flask app
     extra_files = [f for f in app.jinja_loader.list_templates()]
     extra_dirs = ['templates/', 'static/']
     extra_files = extra_files + extra_dirs

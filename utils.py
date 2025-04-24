@@ -129,6 +129,23 @@ TOP_K = 5  # Number of retrieved chunks
 MAX_SUB_QUERIES = 3  # Maximum number of sub-queries for decomposition
 MULTI_QUERY_COUNT = 3  # Number of queries to generate in multi-query approach
 
+# Cache for processed files
+PROCESSED_FILES = set()
+CACHE_FILE = os.path.join(os.getcwd(), "docs", "processed_files.json")
+
+def load_processed_files():
+    """Load the set of processed files from cache"""
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, 'r') as f:
+            return set(json.load(f))
+    return set()
+
+def save_processed_files():
+    """Save the set of processed files to cache"""
+    os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+    with open(CACHE_FILE, 'w') as f:
+        json.dump(list(PROCESSED_FILES), f)
+
 @dataclass
 class Document:
     """Simplified document class to replace langchain's Document"""
