@@ -159,8 +159,9 @@ def index():
     # Check for documents and display them
     global has_documents, processing_status
 
-    # Scan for documents on first access
-    scan_for_documents()
+    # Only scan if we haven't already processed
+    if not has_documents:
+        scan_for_documents()
 
     # Verify registry documents and get valid ones
     valid_docs = verify_registry_documents()
