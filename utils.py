@@ -429,11 +429,11 @@ def build_vectorstore(chunks):
         pass
 
     encoder = SentenceTransformer('all-MiniLM-L6-v2', device=device)
-    
+
     # Convert documents to embeddings with larger batch size and proper error handling
     documents = [chunk.page_content for chunk in chunks]
     metadatas = [chunk.metadata for chunk in chunks]
-    
+
     try:
         embeddings = encoder.encode(
             documents,
@@ -443,7 +443,7 @@ def build_vectorstore(chunks):
             convert_to_tensor=False,
             num_workers=1  # Reduced workers to prevent issues
         )
-        
+
         # Normalize the vectors
         faiss.normalize_L2(embeddings)
     except Exception as e:
