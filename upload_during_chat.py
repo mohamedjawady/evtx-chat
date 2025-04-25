@@ -62,6 +62,9 @@ def register_upload_routes(app, process_documents_func):
                     logging.info(f"Processing EVTX file: {filename}")
                     parser = EvtxParser(file_path)
                     text_content = parser.extract_text()
+                    if not text_content:
+                        raise Exception("Failed to extract text from EVTX file")
+                        
                     txt_filename = os.path.splitext(filename)[0] + '.txt'
                     txt_path = os.path.join(app.config['UPLOAD_FOLDER'], txt_filename)
                     

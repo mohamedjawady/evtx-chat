@@ -1,3 +1,4 @@
+
 import os
 import sys
 import json
@@ -58,143 +59,149 @@ class EvtxParser:
         except Exception as e:
             return f"Error extracting text from EVTX file: {str(e)}"
 
-    def get_records(self, debug: bool = False, render_messages: bool = False) -> List[Dict[str, Any]]:
-        """Retrieves event log records from the EVTX file."""
-        if HAS_EVTX:
-            with evtx.Evtx(self.file_path) as log:
-                records = []
-                for record in log.records():
-                    try:
-                        event_record = self.parse_evtx_record(record, render_messages)
-                        if event_record:
-                            records.append(event_record)
-                    except Exception as e:
-                        if debug:
-                            print(f"Error parsing record: {e}", file=sys.stderr)
-                return records
-        elif HAS_WIN32:
-            return self._get_records_win32(render_messages)
-        else:
-            return []
+    def get_records(self, limit: Optional[int] = None, debug: bool = False, 
+                   render_messages: bool = True) -> List[Dict[str, Any]]:
+        """
+        Extract records from the EVTX file
 
+        Args:
+            limit: Maximum number of records to extract (None for all)
+            debug: If True, print the XML for each record for debugging
+            render_messages: If True, attempt to retrieve rendered message text
 
-    def _get_records_win32(self, render_messages: bool = False) -> List[Dict[str, Any]]:
-        """Retrieves records using the win32evtlogutil library."""
+        Returns:
+            List of dictionaries containing event data
+        """
+        records = []
+        count = 0
+
         try:
-            records = []
-            for record in win32evtlogutil.EvtLogRecordIterator(self.file_path):
-                try:
-                    event_record = self._parse_win32_record(record, render_messages)
-                    if event_record:
-                        records.append(event_record)
-                except Exception as e:
-                    print(f"Error parsing record with win32evtlogutil: {e}", file=sys.stderr)
-            return records
+            with evtx.Evtx(self.file_path) as evtx_file:
+                for record in evtx_file.records():
+                    if limit is not None and count >= limit:
+                        break
 
+                    try:
+                        xml_str = record.xml()
+
+                        if debug:
+                            print(f"\n--- Record {record.record_num()} XML ---")
+                            print(xml_str)
+                            print("-----------------------------\n")
+
+                        event_data = self._parse_xml_to_dict(xml_str)
+                        event_data['record_num'] = record.record_num()
+
+                        if render_messages and HAS_WIN32:
+                            self._add_rendered_message(event_data, debug)
+
+                        records.append(event_data)
+                        count += 1
+                    except Exception as e:
+                        print(f"Error parsing record {record.record_num()}: {e}", file=sys.stderr)
+                        if debug:
+                            import traceback
+                            traceback.print_exc()
+                        continue
         except Exception as e:
-            print(f"Error accessing log file with win32evtlogutil: {e}", file=sys.stderr)
-            return []
+            print(f"Error reading EVTX file: {e}", file=sys.stderr)
+            if debug:
+                import traceback
+                traceback.print_exc()
 
-    def _parse_win32_record(self, record, render_messages: bool = False) -> Optional[Dict[str, Any]]:
-        """Parse a single record obtained using win32evtlogutil."""
-        event_record = {}
-        event_record["System"] = {
-            "EventID": {"Value": record.EventID},
-            "TimeCreated": {"SystemTime": record.TimeCreated.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"},
-            "Channel": record.StringInserts[0], # Assuming Channel is the first insert
-            "Computer": record.ComputerName
+        return records
+
+    def _parse_xml_to_dict(self, xml_str: str) -> Dict[str, Any]:
+        """
+        Parse XML string to dictionary
+
+        Args:
+            xml_str: XML string from EVTX record
+
+        Returns:
+            Dictionary with extracted event data
+        """
+        dom = xml.dom.minidom.parseString(xml_str)
+        event = dom.getElementsByTagName("Event")[0]
+
+        system = event.getElementsByTagName("System")[0]
+
+        event_id_element = system.getElementsByTagName("EventID")
+        event_id = ""
+        qualifiers = ""
+        if event_id_element:
+            event_id = self._get_element_text(system, "EventID")
+            qualifiers = event_id_element[0].getAttribute("Qualifiers")
+
+        provider_element = system.getElementsByTagName("Provider")
+        provider_name = ""
+        provider_guid = ""
+        event_source_name = ""
+        if provider_element:
+            provider_name = provider_element[0].getAttribute("Name")
+            provider_guid = provider_element[0].getAttribute("Guid")
+            event_source_name = provider_element[0].getAttribute("EventSourceName")
+
+        result = {
+            "System": {
+                "Provider": {
+                    "Name": provider_name,
+                    "Guid": provider_guid,
+                    "EventSourceName": event_source_name
+                },
+                "EventID": {
+                    "Value": event_id,
+                    "Qualifiers": qualifiers
+                },
+                "Version": self._get_element_text(system, "Version"),
+                "Level": self._get_element_text(system, "Level"),
+                "Task": self._get_element_text(system, "Task"),
+                "Opcode": self._get_element_text(system, "Opcode"),
+                "Keywords": self._get_element_text(system, "Keywords"),
+                "TimeCreated": {
+                    "SystemTime": self._get_element_attribute(system, "TimeCreated", "SystemTime")
+                },
+                "EventRecordID": self._get_element_text(system, "EventRecordID"),
+                "Channel": self._get_element_text(system, "Channel"),
+                "Computer": self._get_element_text(system, "Computer"),
+            }
         }
 
-        if render_messages and record.RenderedDescription:
-            event_record["RenderedMessage"] = record.RenderedDescription
-        if record.Data:
-            event_record["EventData"] = {str(k):v for k,v in enumerate(record.Data)}
+        event_data_nodes = event.getElementsByTagName("EventData")
+        if event_data_nodes:
+            event_data_element = event_data_nodes[0]
+            data_elements = event_data_element.getElementsByTagName("Data")
 
-        return event_record
+            if data_elements:
+                event_data = {}
+                for idx, data in enumerate(data_elements):
+                    name = data.getAttribute("Name")
+                    value = data.firstChild.nodeValue if data.firstChild else ""
 
+                    if name:
+                        event_data[name] = value
+                    else:
+                        event_data[f"Data_{idx}"] = value
 
-    def parse_evtx_record(self, record, render_messages: bool = False) -> Optional[Dict[str, Any]]:
-        """Parse a single record from an EVTX file using python-evtx."""
-        try:
-            event_record = {}
-            system_fields = {
-                "EventID": "Value",
-                "TimeCreated": "SystemTime",
-                "Channel": "Channel",
-                "Computer": "Computer"
-            }
+                result["EventData"] = event_data
+            else:
+                text_content = event_data_element.textContent.strip()
+                if text_content:
+                    lines = [line.strip() for line in text_content.split('\n') if line.strip()]
+                    result["EventData"] = {f"Data_{i}": value for i, value in enumerate(lines)}
 
-            event_record["System"] = {}
-            for field, attr in system_fields.items():
-                if getattr(record, field):
-                    event_record["System"][field] = {attr:getattr(record, field)}
+        return result
 
-            if render_messages and record.strings and len(record.strings) > 0:
-                event_record["RenderedMessage"] = record.strings[0]
+    def _get_element_text(self, parent, tag_name: str) -> str:
+        """Extract text from an XML element"""
+        elements = parent.getElementsByTagName(tag_name)
+        if elements and elements[0].firstChild:
+            return elements[0].firstChild.nodeValue
+        return ""
 
-            if record.data:
-                event_record["EventData"] = self.parse_event_data(record.data)
-
-            return event_record
-        except Exception as e:
-            print(f"Error parsing record: {e}", file=sys.stderr)
-            return None
-
-    def parse_event_data(self, event_data) -> Dict[str, Any]:
-        """Parse the EventData section of an EVTX record."""
-        parsed_data = {}
-        for item in event_data:
-            name = item.name
-            value = item.value
-            if isinstance(value, bytes):
-                value = value.decode('utf-8', 'ignore')
-            parsed_data[name] = value
-        return parsed_data
-
-    def get_message(self, record, event_id: int) -> str:
-        """Retrieves the message string for a given event ID from the message cache."""
-        if event_id not in self.message_cache:
-            try:
-                message = self.get_message_from_file(record, event_id)
-                self.message_cache[event_id] = message
-            except Exception as e:
-                print(f"Error getting message: {e}", file=sys.stderr)
-                return "Message not found"
-        return self.message_cache[event_id]
-
-    def get_message_from_file(self, record, event_id: int) -> str:
-        """Retrieves message from the EVTX file using subprocess call."""
-
-        # Construct the command to extract message
-        cmd = [
-            "powershell.exe",
-            "-Command",
-            f"""
-            $log = Get-WinEvent -ListLog * -MaxEvents 1
-            Get-WinEvent -LogName $log.LogDisplayName -EventID {event_id} | Select-Object -ExpandProperty Message
-            """
-        ]
-
-        try:
-            # Execute the command and capture output
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            message = result.stdout.strip()
-            return message
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing PowerShell command: {e}", file=sys.stderr)
-            return "Message not found"
-        except Exception as e:
-            print(f"Error: {e}", file=sys.stderr)
-            return "Message not found"
-
-
-
-def evtx_to_text(file_path: str) -> str:
-    """Convert an EVTX file to text format for RAG processing"""
-    try:
-        parser = EvtxParser(file_path)
-        return parser.extract_text()
-    except FileNotFoundError as e:
-        return str(e)
-    except Exception as e:
-        return f"Error converting EVTX to text: {str(e)}"
+    def _get_element_attribute(self, parent, tag_name: str, attr_name: str) -> str:
+        """Extract attribute value from an XML element"""
+        elements = parent.getElementsByTagName(tag_name)
+        if elements:
+            return elements[0].getAttribute(attr_name)
+        return ""
