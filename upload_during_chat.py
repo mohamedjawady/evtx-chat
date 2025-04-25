@@ -56,11 +56,12 @@ def register_upload_routes(app, process_documents_func):
             # Handle EVTX files - convert to text
             if filename.lower().endswith('.evtx'):
                 try:
-                    from evtx_parser import evtx_to_text
+                    from evtx_parser import EvtxParser
                     
                     # Convert EVTX to text and save as TXT
                     logging.info(f"Processing EVTX file: {filename}")
-                    text_content = evtx_to_text(file_path)
+                    parser = EvtxParser(file_path)
+                    text_content = parser.extract_text()
                     txt_filename = os.path.splitext(filename)[0] + '.txt'
                     txt_path = os.path.join(app.config['UPLOAD_FOLDER'], txt_filename)
                     

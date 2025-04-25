@@ -7,6 +7,7 @@ dependencies = [
     "faiss-cpu>=1.10.0",
     "flask>=3.1.0",
     "numpy>=2.2.5",
+    "python-evtx>=0.7.4",
     "setuptools>=79.0.1",
     "werkzeug>=3.1.3",
 ]
