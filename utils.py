@@ -135,14 +135,18 @@ MULTI_QUERY_COUNT = 3  # Number of queries to generate in multi-query approach
 
 # Cache for processed files
 PROCESSED_FILES = set()
-CACHE_FILE = os.path.join(os.path.dirname(__file__), "processed_files.json")
+CACHE_FILE = os.path.join(os.getcwd(), "docs", "processed_files.json")
+
+# Ensure cache directory exists
+os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
 
 def load_processed_files():
     """Load the set of processed files from cache"""
     try:
         if os.path.exists(CACHE_FILE):
             with open(CACHE_FILE, 'r') as f:
-                files = set(json.load(f))
+                data = json.load(f)
+                files = set(os.path.abspath(f) for f in data)
                 logging.info(f"Loaded {len(files)} files from cache")
                 return files
     except Exception as e:
@@ -152,9 +156,10 @@ def load_processed_files():
 def save_processed_files():
     """Save the set of processed files to cache"""
     try:
-        os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
         with open(CACHE_FILE, 'w') as f:
-            json.dump(list(PROCESSED_FILES), f)
+            # Store absolute paths
+            data = [os.path.abspath(f) for f in PROCESSED_FILES]
+            json.dump(data, f)
         logging.info(f"Saved {len(PROCESSED_FILES)} files to cache")
     except Exception as e:
         logging.error(f"Error saving processed files: {e}")
